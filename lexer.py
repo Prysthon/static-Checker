@@ -41,6 +41,7 @@ TOKENS = [
     (r'\{', 'B11'),  # símbolo {
     (r'\}', 'B12'),  # símbolo }
     (r'\*', 'B14'),  # símbolo *
+    (r'/', 'B15'),  # símbolo /
     (r'\+', 'B16'),  # símbolo +
     (r'!=', 'B17'),  # símbolo !=
     (r'#', 'B17'),  # símbolo #
@@ -49,12 +50,13 @@ TOKENS = [
     (r'=', 'B20'),  # símbolo =
     (r'>', 'B21'),  # símbolo >
     (r'>=', 'B22'),  # símbolo >=
-    (r'/', 'B15'),  # símbolo /
     (r'"[^"\\]*(\\.[^"\\]*)*"', 'C01'),  # consCadeia
-    (r'"[a-zA-Z]"', 'C02'),  # consCaracter
+    (r"'[a-zA-Z]'", 'C02'),  # consCaracter
     (r'\b\d+\b', 'C03'),  # consInteiro
     (r'\b\d+(\.\d+)?(e[+-]?\d+)?\b', 'C04'),  # consReal
-    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C07'),  # variavel (default)
+    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C05'),  # nomFuncao
+    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C06'),  # nomPrograma
+    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C07'),  # variavel
 ]
 
 class Lexer:
@@ -66,14 +68,16 @@ class Lexer:
         self.lexeme_indices = {}
         self.tokenize()
 
-    def determine_token_type(self, lexeme, previous_token_type):
-        if previous_token_type in {'tipoFunc', 'tipoVar', 'inteiro', 'real', 'logico', 'caracter', 'vazio'}:
+    def determine_token_type(self, previous_token):
+        if previous_token in {'B05'}:  # :
             return 'C05'  # nomFuncao
+        if previous_token in {'A17'}:  # programa
+            return 'C06'  # nomPrograma
         return 'C07'  # variavel
 
     def tokenize(self):
         index = 0
-        previous_token_type = None
+        previous_token = None
         while self.position < len(self.source_code):
             match = None
             for token_regex, token_type in TOKENS:
@@ -81,8 +85,9 @@ class Lexer:
                 match = pattern.match(self.source_code, self.position)
                 if match:
                     lexeme = match.group(0)
-                    # if token_type == 'C07':  # Handle context-sensitive case for identifiers
-                    #     token_type = self.determine_token_type(lexeme, previous_token_type)
+                    # Determina o tipo de token baseado no contexto
+                    if token_type in {'C05', 'C06', 'C07'}:  # Handle context-sensitive case for identifiers
+                        token_type = self.determine_token_type(previous_token)
                     # Verifica se o lexeme e o tipo já existem no dicionário de índices
                     if (lexeme, token_type) not in self.lexeme_indices:
                         self.lexeme_indices[(lexeme, token_type)] = index
@@ -90,13 +95,13 @@ class Lexer:
                     # Recupera o índice existente
                     lexeme_index = self.lexeme_indices[(lexeme, token_type)]
                     self.tokens.append((lexeme, token_type, lexeme_index, self.current_line))
-                    previous_token_type = token_type
+                    previous_token = token_type
                     self.position = match.end(0)
                     break
-                if not match:
-                    if self.source_code[self.position] == '\n':
-                        self.current_line += 1
-                    self.position += 1
+            if not match:
+                if self.source_code[self.position] == '\n':
+                    self.current_line += 1
+                self.position += 1
 
     def get_tokens(self):
         return self.tokens
