@@ -2,6 +2,7 @@ programa Teste
 declaracoes
     inteiro x
     real y
+    inteiro z
 fimDeclaracoes
 funcoes
 fimFuncoes

@@ -4,59 +4,59 @@ import re
 TOKENS = [
     (r'\bcadeia\b', 'A01'),  # cadeia
     (r'\bcaracter\b', 'A02'),  # caracter
-    (r'\bdeclaracoes\b', 'A03'),
-    (r'\benquanto\b', 'A04'),
-    (r'\bfalse\b', 'A05'),
-    (r'\bfimDeclaracoes\b', 'A06'),
-    (r'\bfimEnquanto\b', 'A07'),
-    (r'\bfimFunc\b', 'A08'),
-    (r'\bfimFuncoes\b', 'A09'),
-    (r'\bfimPrograma\b', 'A10'),
-    (r'\bfimSe\b', 'A11'),
-    (r'\bfuncoes\b', 'A12'),
-    (r'\bimprime\b', 'A13'),
-    (r'\binteiro\b', 'A14'),
-    (r'\blogico\b', 'A15'),
-    (r'\bpausa\b', 'A16'),
-    (r'\bprograma\b', 'A17'),
-    (r'\breal\b', 'A18'),
-    (r'\bretorna\b', 'A19'),
-    (r'\bse\b', 'A20'),
-    (r'\bsenao\b', 'A21'),
-    (r'\btipoFunc\b', 'A22'),
-    (r'\btipoParam\b', 'A23'),
-    (r'\btipoVar\b', 'A24'),
-    (r'\btrue\b', 'A25'),
-    (r'\bvazio\b', 'A26'),
-    (r'%', 'B01'),
-    (r'\(', 'B02'),
-    (r'\)', 'B03'),
-    (r',', 'B04'),
-    (r':', 'B05'),
-    (r':=', 'B06'),
-    (r';', 'B07'),
-    (r'\?', 'B08'),
-    (r'\[', 'B09'),
-    (r'\]', 'B10'),
-    (r'\{', 'B11'),
-    (r'\}', 'B12'),
-    (r'\*', 'B14'),
-    (r'\+', 'B16'),
-    (r'!=', 'B17'),
-    (r'#', 'B17'),
-    (r'<', 'B18'),
-    (r'<=', 'B19'),
-    (r'=', 'B20'),
-    (r'>', 'B21'),
-    (r'>=', 'B22'),
-    (r'/', 'B15'),
-    (r'"[^"\\]*(\\.[^"\\]*)*"', 'C01'),
-    (r'"[a-zA-Z]"', 'C02'),
-    (r'\b\d+\b', 'C03'),
-    (r'\b\d+(\.\d+)?(e[+-]?\d+)?\b', 'C04'),
-    (r'\b[a-zA-Z][a-zA-Z0-9]*\b', 'C05'),
-    (r'\b[a-zA-Z][a-zA-Z0-9]*\b', 'C06'),
-    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C07'),
+    (r'\bdeclaracoes\b', 'A03'),  # declaracoes
+    (r'\benquanto\b', 'A04'),  # enquanto
+    (r'\bfalse\b', 'A05'),  # false
+    (r'\bfimDeclaracoes\b', 'A06'),  # fimDeclaracoes
+    (r'\bfimEnquanto\b', 'A07'),  # fimEnquanto
+    (r'\bfimFunc\b', 'A08'),  # fimFunc
+    (r'\bfimFuncoes\b', 'A09'),  # fimFuncoes
+    (r'\bfimPrograma\b', 'A10'),  # fimPrograma
+    (r'\bfimSe\b', 'A11'),  # fimSe
+    (r'\bfuncoes\b', 'A12'),  # funcoes
+    (r'\bimprime\b', 'A13'),  # imprime
+    (r'\binteiro\b', 'A14'),  # inteiro
+    (r'\blogico\b', 'A15'),  # logico
+    (r'\bpausa\b', 'A16'),  # pausa
+    (r'\bprograma\b', 'A17'),  # programa
+    (r'\breal\b', 'A18'),  # real
+    (r'\bretorna\b', 'A19'),  # retorna
+    (r'\bse\b', 'A20'),  # se
+    (r'\bsenao\b', 'A21'),  # senao
+    (r'\btipoFunc\b', 'A22'),  # tipoFunc
+    (r'\btipoParam\b', 'A23'),  # tipoParam
+    (r'\btipoVar\b', 'A24'),  # tipoVar
+    (r'\btrue\b', 'A25'),  # true
+    (r'\bvazio\b', 'A26'),  # vazio
+    (r'%', 'B01'),  # símbolo %
+    (r'\(', 'B02'),  # símbolo (
+    (r'\)', 'B03'),  # símbolo )
+    (r',', 'B04'),  # símbolo ,
+    (r':', 'B05'),  # símbolo :
+    (r':=', 'B06'),  # símbolo :=
+    (r';', 'B07'),  # símbolo ;
+    (r'\?', 'B08'),  # símbolo ?
+    (r'\[', 'B09'),  # símbolo [
+    (r'\]', 'B10'),  # símbolo ]
+    (r'\{', 'B11'),  # símbolo {
+    (r'\}', 'B12'),  # símbolo }
+    (r'\*', 'B14'),  # símbolo *
+    (r'\+', 'B16'),  # símbolo +
+    (r'!=', 'B17'),  # símbolo !=
+    (r'#', 'B17'),  # símbolo #
+    (r'<', 'B18'),  # símbolo <
+    (r'<=', 'B19'),  # símbolo <=
+    (r'=', 'B20'),  # símbolo =
+    (r'>', 'B21'),  # símbolo >
+    (r'>=', 'B22'),  # símbolo >=
+    (r'/', 'B15'),  # símbolo /
+    (r'"[^"\\]*(\\.[^"\\]*)*"', 'C01'),  # consCadeia
+    (r'"[a-zA-Z]"', 'C02'),  # consCaracter
+    (r'\b\d+\b', 'C03'),  # consInteiro
+    (r'\b\d+(\.\d+)?(e[+-]?\d+)?\b', 'C04'),  # consReal
+    (r'\b[a-zA-Z][a-zA-Z0-9]*\b', 'C05'),  # nomFuncao
+    (r'\b[a-zA-Z][a-zA-Z0-9]*\b', 'C06'),  # nomPrograma
+    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C07'),  # variavel
 ]
 
 class Lexer:
