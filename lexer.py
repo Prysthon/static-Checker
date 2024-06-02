@@ -81,8 +81,8 @@ class Lexer:
                 match = pattern.match(self.source_code, self.position)
                 if match:
                     lexeme = match.group(0)
-                    if token_type == 'C07':  # Handle context-sensitive case for identifiers
-                        token_type = self.determine_token_type(lexeme, previous_token_type)
+                    # if token_type == 'C07':  # Handle context-sensitive case for identifiers
+                    #     token_type = self.determine_token_type(lexeme, previous_token_type)
                     # Verifica se o lexeme e o tipo já existem no dicionário de índices
                     if (lexeme, token_type) not in self.lexeme_indices:
                         self.lexeme_indices[(lexeme, token_type)] = index
@@ -93,10 +93,10 @@ class Lexer:
                     previous_token_type = token_type
                     self.position = match.end(0)
                     break
-            if not match:
-                if self.source_code[self.position] == '\n':
-                    self.current_line += 1
-                self.position += 1
+                if not match:
+                    if self.source_code[self.position] == '\n':
+                        self.current_line += 1
+                    self.position += 1
 
     def get_tokens(self):
         return self.tokens
