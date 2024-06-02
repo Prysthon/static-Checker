@@ -54,37 +54,43 @@ TOKENS = [
     (r'"[a-zA-Z]"', 'C02'),  # consCaracter
     (r'\b\d+\b', 'C03'),  # consInteiro
     (r'\b\d+(\.\d+)?(e[+-]?\d+)?\b', 'C04'),  # consReal
-    (r'\b[a-zA-Z][a-zA-Z0-9]*\b', 'C05'),  # nomFuncao
-    (r'\b[a-zA-Z][a-zA-Z0-9]*\b', 'C06'),  # nomPrograma
-    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C07'),  # variavel
+    (r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 'C07'),  # variavel (default)
 ]
 
 class Lexer:
     def __init__(self, source_code):
-        self.source_code = source_code
+        self.source_code = source_code.lower()  # Normaliza para minúsculas
         self.position = 0
         self.current_line = 1
         self.tokens = []
         self.lexeme_indices = {}
         self.tokenize()
 
+    def determine_token_type(self, lexeme, previous_token_type):
+        if previous_token_type in {'tipoFunc', 'tipoVar', 'inteiro', 'real', 'logico', 'caracter', 'vazio'}:
+            return 'C05'  # nomFuncao
+        return 'C07'  # variavel
+
     def tokenize(self):
         index = 0
+        previous_token_type = None
         while self.position < len(self.source_code):
             match = None
             for token_regex, token_type in TOKENS:
-                pattern = re.compile(token_regex)
+                pattern = re.compile(token_regex, re.IGNORECASE)  # Compila regex como case-insensitive
                 match = pattern.match(self.source_code, self.position)
                 if match:
                     lexeme = match.group(0)
-                    if token_type:
-                        # Verifica se o lexeme e o tipo já existem no dicionário de índices
-                        if (lexeme, token_type) not in self.lexeme_indices:
-                            self.lexeme_indices[(lexeme, token_type)] = index
-                            index += 1
-                        # Recupera o índice existente
-                        lexeme_index = self.lexeme_indices[(lexeme, token_type)]
-                        self.tokens.append((lexeme, token_type, lexeme_index, self.current_line))
+                    if token_type == 'C07':  # Handle context-sensitive case for identifiers
+                        token_type = self.determine_token_type(lexeme, previous_token_type)
+                    # Verifica se o lexeme e o tipo já existem no dicionário de índices
+                    if (lexeme, token_type) not in self.lexeme_indices:
+                        self.lexeme_indices[(lexeme, token_type)] = index
+                        index += 1
+                    # Recupera o índice existente
+                    lexeme_index = self.lexeme_indices[(lexeme, token_type)]
+                    self.tokens.append((lexeme, token_type, lexeme_index, self.current_line))
+                    previous_token_type = token_type
                     self.position = match.end(0)
                     break
             if not match:
@@ -94,3 +100,4 @@ class Lexer:
 
     def get_tokens(self):
         return self.tokens
+
