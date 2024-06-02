@@ -1,0 +1,8 @@
+programa Teste
+declaracoes
+    inteiro x
+    real y
+fimDeclaracoes
+funcoes
+fimFuncoes
+fimPrograma
