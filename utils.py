@@ -7,3 +7,15 @@ def read_file(file_path):
 def write_file(file_path, content):
     with open(file_path, 'w') as file:
         file.write(content)
+
+def determinar_escopo(previous_token):
+    # : -> nomFuncao
+    if previous_token == 'B05':
+        return 'C05'
+    
+    # programa -> nomPrograma
+    if previous_token == 'A17':
+        return 'C06'
+    
+    # variavel
+    return 'C07'
