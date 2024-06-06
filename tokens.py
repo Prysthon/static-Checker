@@ -44,12 +44,12 @@ TOKENS = [
     (r'/', 'B15'),  # símbolo /
     (r'\+', 'B16'),  # símbolo +
     (r'!=', 'B17'),  # símbolo !=
-    (r'#', 'B17'),  # símbolo #
-    (r'<', 'B18'),  # símbolo <
-    (r'<=', 'B19'),  # símbolo <=
-    (r'=', 'B20'),  # símbolo =
-    (r'>', 'B21'),  # símbolo >
-    (r'>=', 'B22'),  # símbolo >=
+    (r'#', 'B18'),  # símbolo #
+    (r'<', 'B19'),  # símbolo <
+    (r'<=', 'B20'),  # símbolo <=
+    (r'=', 'B21'),  # símbolo =
+    (r'>', 'B22'),  # símbolo >
+    (r'>=', 'B23'),  # símbolo >=
     (r'"[^"\\]*(\\.[^"\\]*)*"', 'C01'),  # consCadeia
     (r"'[A-Z]'", 'C02'),  # consCaracter
     (r'\b\d+\b', 'C03'),  # consInteiro
