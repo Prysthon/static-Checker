@@ -2,7 +2,6 @@ import re
 from padroes import PADROES
 from palavras import PALAVRAS
 
-
 class Lexer:
     def __init__(self, source_code):
         self.source_code = source_code.upper()  # Normaliza para maiúsculas
