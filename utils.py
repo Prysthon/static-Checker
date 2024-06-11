@@ -14,8 +14,9 @@ def determinar_escopo(previous_token):
         return 'C05'
     
     # programa -> nomPrograma
-    if previous_token == 'A17':
+    elif previous_token == 'A17':
         return 'C06'
     
     # variavel
-    return 'C07'
+    else:
+        return 'C07'
