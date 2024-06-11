@@ -1,6 +1,7 @@
 import re
 from padroes import PADROES
 from palavras import PALAVRAS
+from alfabeto import ALFABETO
 
 class Lexer:
     def __init__(self, source_code):
@@ -10,85 +11,112 @@ class Lexer:
         self.current_line = 1
         self.fim_lex = 0
         self.index_relatorio = 0
-        self.index_tabela = 0
 
+    # Para fazer em formacao_lexeme:
+    #
+    # identificação do lexeme (acho melhor sem usar regex, ou então podemos melhorar o regex) ->
+    #
+    # filtro de segundo nivel, ou seja:
+    # -> utilizar os caracteres não relevantes (como espaços e quebras de linha) como delimitadores
+    # -> remover construções não relevantes (exemplo da string com \ no meio) (?)
+    # -> impor o limite de 30 caracteres por átomo, com os caracteres posteriores
+    #    sendo considerados inválidos (até que se encontre um delimitador) 
+    #
     def formacao_lexeme(self, inicio_lex):
         lexeme = ''
-        # Para fazer:
-        #
-        # identificação do lexeme (acho melhor sem usar regex, ou então podemos melhorar o regex) ->
-        #
-        # filtro de primeiro nivel, ou seja:
-        # ignorar/remover os caracteres invalidos sem os considerar como delimitadores;
-        # impor o limite de 30 caracteres por átomo, com os caracteres posteriores
-        # sendo considerados inválidos (até que se encontre um delimitador)
-        #
-        # filtro de segundo nivel, ou seja:
-        # utilizar os caracteres não relevantes (como espaços, quebra de linha e comentarios)
-        # como delimitadores, e *remover construções não relevantes* (exemplo da string com \ no meio)
-        #
-        return lexeme
+        token_type = ''
+
+        self.pre_lexico()
+
+        return (lexeme, token_type)
+    
+    def remover_invalidos(self, inicio, fim):
+        str = self.source_code[:inicio] + self.source_code[(fim + 1):]
+        return str
+
+
+    def pre_lexico(self):
+        posicao = 0
+        inicio = 0
+        fim = 0
+
+        while posicao < len(self.source_code):
+            # remoção de comentários
+            if self.source_code[posicao] == '/':
+                # comentários de linha
+                if self.source_code[posicao + 1] == '/':
+                    inicio = posicao
+                    fim = posicao
+                    while self.source_code[fim] != '\n' and fim < len(self.source_code):
+                        fim += 1
+                    self.source_code = self.remover_invalidos(inicio, (fim - 1))
+                # comentários de bloco
+                elif self.source_code[posicao + 1] == '*':
+                    inicio = posicao
+                    fim = posicao
+                    while self.source_code[fim] != '*' and self.source_code[fim + 1] != '/' and fim < len(self.source_code):
+                        fim +=1
+                    self.remover_invalidos(inicio, (fim - 1))
+            # remoção de caracteres não permitidos
+            if self.source_code[posicao] not in ALFABETO:
+                self.source_code = self.remover_invalidos(posicao, posicao)
+            posicao += 1
 
     def is_reservada(self, lexeme):
         if lexeme in PALAVRAS:
             return True
         return False
 
-    def tratamento_reservada(self, lexeme, inicio_lex):
+    def tratamento_reservada(self, lexeme, inicio_lex, token_type):
         # adciona palavra reservada na lista de dados
-        self.tokens_dados_p_relatorio.append(
-            (lexeme, "palavraReservada", self.index_relatorio, self.current_line)
-        )
-
+        # index (-1) para sinalizar que é palavra reservada
+        self.tokens_dados_p_relatorio.append((lexeme, token_type, (-1), self.current_line))
         self.index_relatorio += 1
 
         # atribui o ponteiro de inicio ao final do ultimo lexeme
         inicio_lex = self.fim_lex
 
-        return ("palavraReservada", inicio_lex)
+        return inicio_lex
 
-    def tratamento_construcoes(self, lexeme, inicio_lex, escopo):
-        # Para fazer:
-        # utilizar o escopo, se necessario, para reconhecer se o
-        # lexeme é: variavel, nomFuncao ou nomPrograma,
-        # e identificar o tipo do token (token_type)
+    def tratamento_construcoes(self, lexeme, inicio_lex, token_type, escopo, symbol_table):
+        # verifica o escopo
+        if token_type in ('C05', 'C06', 'C07'):
+            token_type = escopo
 
+        # adciona átomo formado no dicionario de simbolos, se não já estiver
+        symbol_table.add(lexeme, token_type)
+        
         # adciona palavra reservada na lista de dados
         self.tokens_dados_p_relatorio.append(
-            (lexeme, token_type, self.index_tabela, self.current_line)
+            (lexeme, token_type, symbol_table.getIndex(lexeme, token_type), self.current_line)
         )
         self.index_relatorio += 1
-
-        # adciona átomo formado no dicionario de simbolos
-        self.tokens_indices[(lexeme, token_type)] = self.index_tabela
-        self.index_tabela += 1
-
-        # Para fazer:
-        # adcionar o átomo formado na tabela de simbolos
 
         # atribui o ponteiro de inicio ao final do ultimo lexeme
         inicio_lex = self.fim_lex
 
         return (token_type, inicio_lex)
 
-    def formar_atomo(self, inicio_lex, escopo, SymbolTable):
-        lexeme = ""
-        token_type = ""
-
-        lexeme = self.formacao_lexeme(inicio_lex)
-
-        if self.is_reservada(lexeme):
-            token_type, inicio_lex = self.tratamento_reservada(lexeme, inicio_lex)
-            return (token_type, inicio_lex)
-
-        token_type, inicio_lex = self.tratamento_construcoes(lexeme, inicio_lex, escopo)
-        
+    def verificar_linha(self): # isso funciona??
         if self.inicio_lex < len(self.source_code):
             if self.source_code[self.inicio_lex] == "\n":
                 self.current_line += 1
             self.position += 1
-        
-        return (token_type, inicio_lex)
+
+    def formar_atomo(self, inicio_lex, escopo, symbol_table):
+        lexeme = ""
+        token_type = ""
+
+        lexeme, token_type = self.formacao_lexeme(inicio_lex)
+
+        if self.is_reservada(lexeme):
+            inicio_lex = self.tratamento_reservada(lexeme, inicio_lex, token_type)
+            self.verificar_linha()
+            return (token_type, inicio_lex)
+        else:
+            token_type, inicio_lex = self.tratamento_construcoes(lexeme, inicio_lex, token_type, escopo, symbol_table)
+            self.verificar_linha()
+            return (token_type, inicio_lex)
 
     # codigo antigo
     #
