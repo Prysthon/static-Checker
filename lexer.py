@@ -6,7 +6,7 @@ from utils import uppercase_menos_sequencias
 
 class Lexer:
     def __init__(self, source_code):
-        self.source_code = uppercase_menos_sequencias(self.source_code)
+        self.source_code = uppercase_menos_sequencias(source_code)
         self.tokens_dados_p_relatorio = []
         self.current_line = 1
         self.inicio_lex = 0
