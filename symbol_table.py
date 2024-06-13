@@ -1,29 +1,32 @@
 # symbol_table.py
 
+from utils import get_codigo
+
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
         self.index = 0
 
-    def add_symbol(self, lexeme, symbol_type):
+    def add(self, lexeme, token_type, qtd_antes_truncar, current_line):
         if lexeme not in self.symbols:
+
             self.symbols[lexeme] = {
-                'index': self.index,
-                'type': symbol_type,
-                'count': 1,
-                'lines': []
+                'Index': self.index,
+                'Codigo': token_type,
+                'Lexeme': lexeme,
+                'QtdAntesTruncar': qtd_antes_truncar,
+                'QtdCharDpsTruncar': len(lexeme),
+                'Qtd': 1,
+                'Tipo': get_codigo(lexeme),
+                'Linhas': [current_line],
             }
             self.index += 1
         else:
-            self.symbols[lexeme]['count'] += 1
+            self.add_line(current_line)
+            self.symbols[lexeme]['Qtd'] += 1
 
-    def add_line(self, lexeme, line):
-        if lexeme in self.symbols:
-            if len(self.symbols[lexeme]['lines']) < 5:
-                self.symbols[lexeme]['lines'].append(line)
-
-    def get_symbol(self, lexeme):
-        return self.symbols.get(lexeme, None)
+    def add_line(self, lexeme, current_line):
+        self.symbols[lexeme]['Linhas'].append(current_line)
 
     def get_symbols(self):
         return self.symbols
