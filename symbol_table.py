@@ -22,7 +22,7 @@ class SymbolTable:
             }
             self.index += 1
         else:
-            self.add_line(current_line)
+            self.add_line(lexeme, current_line)
             self.symbols[lexeme]['Qtd'] += 1
 
     def add_line(self, lexeme, current_line):
@@ -30,3 +30,9 @@ class SymbolTable:
 
     def get_symbols(self):
         return self.symbols
+    
+    def getIndex(self, lexeme, token_type):
+        if lexeme in self.symbols and self.symbols[lexeme]['Codigo'] == token_type:
+            return self.symbols[lexeme]['Index']
+        else:
+            return -1

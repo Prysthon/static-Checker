@@ -12,14 +12,13 @@ def write_file(file_path, content):
         file.write(content)
 
 def uppercase_menos_sequencias(string):
-    # Function to convert match to uppercase if it's not an escape sequence
-    def to_upper_except_escapes(match):
+    # funcao para transformar tudo em maiusculo exceto sequencias de escape
+    def maiusculo_menos_sequencias(match):
         if match.group() in ['\\n', '\\t', '\\r']:
             return match.group()
         return match.group().upper()
 
-    # Replace each match using the custom function
-    return re.sub(r'\\[ntr]|.', to_upper_except_escapes, string)
+    return re.sub(r'\\[ntr]|.', maiusculo_menos_sequencias, string)
 
 def determinar_escopo(previous_token):
     # : -> nomFuncao
@@ -39,3 +38,7 @@ def get_codigo(lexeme):
         if re.fullmatch(padrao, lexeme):
             return codigo
     return None
+
+def remover_invalidos(source_code, inicio, fim):
+    str = source_code[:inicio] + source_code[(fim + 1):]
+    return str
