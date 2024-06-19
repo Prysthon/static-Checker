@@ -22,15 +22,15 @@ def main():
     tokens_dados_p_relatorio = []
     escopo = ""
     previous_token = ""
-
+    
     # 3º: loop analisador lexico
-    while inicio_lex < len(source_code):
+    while inicio_lex < len(source_code) - 1:
         escopo = determinar_escopo(previous_token)
         previous_token, inicio_lex = lexer.formar_atomo(
             inicio_lex, escopo, symbol_table
         )
 
-    tokens_dados_p_relatorio = lexer.get_tokens_dados()
+    tokens_dados_p_relatorio = lexer.get_tokens_dados_p_relatorio()
 
     # 4º: gerar relatorios .LEX e .TAB
     relatorio = Relatorio(tokens_dados_p_relatorio)

@@ -14,23 +14,21 @@ class Lexer:
         self.current_line = 1
         self.inicio_lex = 0
         self.especial = 0
+        self.automato = AutomatoLex(self.source_code)
+        self.filtro()
 
-    def formacao_lexeme(self, inicio_lex):
+    def formacao_lexeme(self, inicio_lex, escopo):
         self.inicio_lex = inicio_lex
-        automato = AutomatoLex(self.source_code)
         lexeme = ""
         token_type = ""
         qtd_antes_truncar = 0
 
-        automato.add_estados_base()
-        self.filtro()
-
         lexeme, token_type, self.inicio_lex, self.source_code, qtd_antes_truncar = (
-            automato.run(self.source_code, self.inicio_lex)
+            self.automato.run(self.source_code, self.inicio_lex, escopo)
         )
-        while lexeme == "ERRO" and token_type == "ERRO":
+        while lexeme == "erro" and token_type == "erro":
             lexeme, token_type, self.inicio_lex, self.source_code, qtd_antes_truncar = (
-                automato.run(self.source_code, self.inicio_lex)
+                self.automato.run(self.source_code, self.inicio_lex, escopo)
             )
 
         return (lexeme, token_type, qtd_antes_truncar)
@@ -71,8 +69,9 @@ class Lexer:
             posicao += 1
 
     def is_reservada(self, lexeme):
-        if lexeme in PALAVRAS:
-            return True
+        for palavra, _ in PALAVRAS:
+            if lexeme == palavra:
+                return True
         return False
 
     def tratamento_reservada(self, lexeme, token_type):
@@ -83,21 +82,11 @@ class Lexer:
         )
 
     def tratamento_construcoes(
-        self, lexeme, token_type, escopo, symbol_table, qtd_antes_truncar
+        self, lexeme, token_type, symbol_table, qtd_antes_truncar
     ):
-        # caso especial da variavel com '_'
-        # if token_type == '000':
-        #   self.especial = 1
-
-        # verifica o escopo
-
-        # if self.especial == 0
-        if token_type in ("C05", "C06", "C07"):
-            token_type = escopo
-        # else self.especial = 0
 
         # adciona átomo formado na tabela de símbolos
-        symbol_table.add(lexeme, token_type, qtd_antes_truncar, self.current_line)
+        # symbol_table.add(lexeme, token_type, qtd_antes_truncar, self.current_line)
 
         # adciona construção na lista de dados
         self.tokens_dados_p_relatorio.append(
@@ -116,23 +105,22 @@ class Lexer:
         lexeme = ""
         token_type = ""
         qtd_antes_truncar = 0
-
-        while self.inicio_lex in (" ", "\n", "\t", "\r"):
-            if self.inicio_lex == "\n":
+        
+        while self.source_code[self.inicio_lex] in (" ", "\n", "\t", "\r"):
+            if self.inicio_lex >= len(self.source_code) - 1:
+                return (token_type, self.inicio_lex)
+            if self.source_code[self.inicio_lex] in ("\n", "\r"):
                 self.current_line += 1
             self.inicio_lex += 1
 
-        if self.inicio_lex == "EOF":
-            return (token_type, self.inicio_lex)
-
-        lexeme, token_type, qtd_antes_truncar = self.formacao_lexeme(inicio_lex)
+        lexeme, token_type, qtd_antes_truncar = self.formacao_lexeme(self.inicio_lex, escopo)
 
         if self.is_reservada(lexeme):
             self.tratamento_reservada(lexeme, token_type)
             return (token_type, self.inicio_lex)
         else:
             token_type = self.tratamento_construcoes(
-                lexeme, token_type, escopo, symbol_table, qtd_antes_truncar
+                lexeme, token_type, symbol_table, qtd_antes_truncar
             )
             return (token_type, self.inicio_lex)
 

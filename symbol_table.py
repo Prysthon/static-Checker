@@ -18,7 +18,7 @@ class SymbolTable:
                 "QtdAntesTruncar": qtd_antes_truncar,
                 "QtdCharDpsTruncar": len(lexeme),
                 "Qtd": 1,
-                "Tipo": get_codigo(lexeme),
+                "Tipo": get_codigo(lexeme), # errado
                 "Linhas": [current_line],
             }
             self.index += 1

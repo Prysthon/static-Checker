@@ -8,11 +8,7 @@ from utils import get_codigo
 Implementar o autômato:
     # FEITO # - O autômato deve receber a posição atual no texto-fonte, processar o caracter nessa posição e avançar seu estado, avançando também uma posição no texto-fonte;
 
-    - O token_type é definido por qual foi o estado de aceitação em que o átomo foi delimitado;
-        - Caso especial -> variavel, nomFuncao e nomPrograma:
-            * variavel, nomFuncao e nomPrograma tem a mesma lei de formação; no entanto, variavel é o único tipo entre esses três que permite "_";
-            * sendo assim, caso seja formada uma variavel com um "_", deve-se retornar um token_type diferente para que a análise de escopo seja ignorada
-            * somente para essa variavel especificamente.
+    # FEITO # - O token_type é definido por qual foi o estado de aceitação em que o átomo foi delimitado;
 
     # FEITO # - Ao chegar em um estado de aceitação que não possua transições, o átomo é delimitado naquele ponto e o autômato se encerra;
 
@@ -40,25 +36,43 @@ Implementar o autômato:
 
     # FEITO # - Após tudo isso, modificar self.inicio_lex para ser igual a self.fim_lex + 1 (para que se continue o processo)
 
-    # FEITO # - Após tudo isso, retorna (lexeme, token_type, qtd_antes_truncar)
+    # FEITO # - Após tudo isso, retorna (lexeme, token_type, fim_lex + 1, source_code, qtd_antes_truncar)
     """
 
 
 class AutomatoLex:
 
-    def __init__(self, texto_fonte):
+    def __init__(self, source_code):
+        # valores padrão
         self.estado_inicial = "Q0"
         self.funcoes = {}
         self.estados_finais = []
-        self.texto_fonte = texto_fonte
+        # valores resetados a cada vez que o automato rodar
+        self.source_code = source_code
         self.inicio_lex = 0
         self.fim_lex = 0
-        self.tamanho = 1
-        self.tamanho_antes_truncar = 0
+        self.prox_char = 0
+        self.tamanho = 0
+        self.posicao_limite = 0
+        self.is_aceitacao = 0
+        # valores para serem retornardos
+        self.lexeme = ""
+        self.token_type = ""
+        self.qtd_antes_truncar = 0
+        # função de inicialização
+        self.add_estados_base()
+
+    def reset_automato(self, source_code, inicio_lex):
+        self.source_code = source_code
+        self.inicio_lex = inicio_lex
+        self.fim_lex = inicio_lex
+        self.prox_char = inicio_lex
+        self.tamanho = 0
         self.posicao_limite = 0
         self.is_aceitacao = 0
         self.lexeme = ""
         self.token_type = ""
+        self.qtd_antes_truncar = 0
 
     def add_estado(self, nome, funcao, is_estado_final=0):
         nome = nome.upper()
@@ -66,114 +80,157 @@ class AutomatoLex:
         if is_estado_final:
             self.estados_finais.append(nome)
 
-    def run(self, texto_fonte, inicio_lex):
-        self.texto_fonte = texto_fonte
-        self.inicio_lex = inicio_lex
-        self.fim_lex = inicio_lex
-        novo_estado = self.estado_inicial
+    def delimitar(self, inicio_lex, fim_lex):
+        return self.source_code[inicio_lex : fim_lex + 1]
 
+    def run(self, source_code, inicio_lex, escopo):
+        self.reset_automato(source_code, inicio_lex,)
+
+        novo_estado = self.estado_inicial
         funcao = self.funcoes[self.estado_inicial]
 
         while True:
+            # velho_estado tem que ser salvo para caso de transição não prevista
             velho_estado = novo_estado
-            novo_estado = funcao(self.texto_fonte[self.fim_lex])
-            if novo_estado in self.estados_finais:
-                self.is_aceitacao = 1
-            else:
-                self.is_aceitacao = 0
+            # caracter da posição final atual do átomo é enviado como parâmetro para a função do estado atual
+            novo_estado = funcao(self.source_code[self.prox_char])
+            self.prox_char += 1
+            self.tamanho += 1
 
-            if (
-                novo_estado == "erro"
-            ):  # transição não prevista, delimitação ocorre na posição anterior
-                self.fim_lex -= 1
-                self.lexeme = texto_fonte[self.inicio_lex : self.fim_lex + 1]
-                self.token_type = self.get_token_type(velho_estado)
-                self.truncar()
+            if self.tamanho == 30:
+                self.posicao_limite = self.prox_char - 1
 
-                if self.is_relevante() == False:
-                    return ("ERRO", "ERRO", self.inicio_lex, self.texto_fonte, 0)
+            # primeiro caso de conclusão, transição não prevista
+            if novo_estado == "erro":
+                # transição não prevista, átomo deve ser delimitado na posição anterior
+                self.fim_lex = self.prox_char - 2
+                self.tamanho -= 1
 
-                self.tamanho_antes_truncar = self.fim_lex - self.posicao_limite
+                if velho_estado in self.estados_finais:
+                    self.is_aceitacao = 1
+                else:
+                    self.is_aceitacao = 0
 
-                return (
-                    self.lexeme,
-                    self.token_type,
-                    self.fim_lex + 1,
-                    self.texto_fonte,
-                    self.tamanho_antes_truncar,
-                )
-                # ele retorna: o lexeme, o token_type, a proxima posicao, o texto_fonte modificado, e o tamanho antes de truncar
+                self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
+                self.token_type = self.get_token_type(velho_estado, self.lexeme)
 
-            if novo_estado in self.estados_finais:
-                if (
-                    novo_estado not in self.funcoes
-                ):  # estado final sem mais transições, delimitação ocorre na posiução atual
-                    self.lexeme = texto_fonte[self.inicio_lex : self.fim_lex + 1]
-                    self.token_type = self.get_token_type(novo_estado)
+                self.qtd_antes_truncar = self.fim_lex - self.inicio_lex
+                if self.qtd_antes_truncar == 0:
+                    self.qtd_antes_truncar = 1
+
+                if self.tamanho > 30:  # tamanho máximo permitido para átomos é 30
                     self.truncar()
 
-                if self.is_relevante() == False:
-                    return ("ERRO", "ERRO", self.inicio_lex, self.texto_fonte, 0)
-
-                self.tamanho_antes_truncar = self.fim_lex - self.posicao_limite
+                if self.is_relevante() == False:  # testar para construção não relevante
+                    return (
+                        "erro",
+                        "erro",
+                        self.inicio_lex,
+                        self.source_code,
+                        self.qtd_antes_truncar,
+                    )
 
                 return (
                     self.lexeme,
                     self.token_type,
                     self.fim_lex + 1,
-                    self.texto_fonte,
-                    self.tamanho_antes_truncar,
+                    self.source_code,
+                    self.qtd_antes_truncar,
                 )
-                # ele retorna: o lexeme, o token_type, a proxima posicao, o texto_fonte modificado, e o tamanho antes de truncar
+                # retorna: o lexeme, o token_type, a proxima posicao para se iniciar, o source_code modificado, e a qtd_antes_truncar
 
-            else:
-                funcao = self.funcoes[novo_estado]
-                if self.tamanho == 30:
-                    self.posicao_limite = self.fim_lex
-                self.fim_lex += 1
-                self.tamanho += 1
+            # segundo caso de conclusão, estado final sem mais transições, delimitação ocorre na posição atual
+            if novo_estado in self.estados_finais:
+                if novo_estado not in self.funcoes:
+
+                    if novo_estado in self.estados_finais:
+                        self.is_aceitacao = 1
+                    else:
+                        self.is_aceitacao = 0
+
+                    self.fim_lex = self.prox_char - 1
+                    self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
+                    self.token_type = self.get_token_type(novo_estado)
+
+                    self.qtd_antes_truncar = self.fim_lex - self.inicio_lex
+                    if self.qtd_antes_truncar == 0:
+                        self.qtd_antes_truncar = 1
+
+                    if self.tamanho > 30:  # tamanho máximo permitido para átomos é 30
+                        self.truncar()
+
+                    if self.is_relevante() == False:  # testar para construção não relevante
+                        return (
+                            "erro",
+                            "erro",
+                            self.inicio_lex,
+                            self.source_code,
+                            self.qtd_antes_truncar,
+                        )
+
+                    return (
+                        self.lexeme,
+                        self.token_type,
+                        self.fim_lex + 1,
+                        self.source_code,
+                        self.qtd_antes_truncar,
+                    )
+                    # retorna: o lexeme, o token_type, a proxima posicao, o source_code modificado, e a qtd_antes_truncar
+
+            funcao = self.funcoes[novo_estado]
 
     def is_relevante(self):
         if self.is_aceitacao == 0:
-            remover_invalidos(self.texto_fonte, self.inicio_lex, self.fim_lex)
+            remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
+            self.fim_lex = self.inicio_lex
+            self.prox_char = self.inicio_lex
             return False
 
         if self.token_type == "C01":
             allowed_chars = set(c for c, *_ in ALFABETO)
             if any(char not in allowed_chars for char in self.lexeme):
-                remover_invalidos(self.texto_fonte, self.inicio_lex, self.fim_lex)
+                remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
+                self.fim_lex = self.inicio_lex
+                self.prox_char = self.inicio_lex
                 return False
         return True
 
     def truncar(self):
-        if self.tamanho > 30:
-            self.texto_fonte = remover_invalidos(
-                self.texto_fonte, self.posicao_limite + 1, self.fim_lex
-            )
-            # verificação de casos especiais:
-            if self.token_type == "C04":
-                if self.texto_fonte[self.posicao_limite] in (".", "E"):
-                    self.posicao_limite -= 1
-                    self.token_type = "C03"
+        self.source_code = remover_invalidos(
+            self.source_code, self.posicao_limite + 1, self.fim_lex
+        )
+        self.fim_lex = self.posicao_limite
+        # verificação de casos especiais:
+        if self.token_type == "C04":
+            if self.source_code[self.fim_lex] in (".", "E"):
+                self.self.fim_lex -= 1
+                remover_invalidos(self.source_code, self.fim_lex + 1, self.fim_lex + 1)
+                self.token_type = "C03"
+                self.delimitar(self.inicio_lex, self.fim_lex)
 
-            if self.token_type == "C04":
-                str = self.texto_fonte[self.inicio_lex : self.tamanho_limite + 1]
-                if "." not in str:
-                    self.token_type = "C03"
+        if self.token_type == "C04":
+            str = self.source_code[self.inicio_lex : self.fim_lex + 1]
+            if "." not in str:
+                self.token_type = "C03"
+                self.delimitar(self.inicio_lex, self.fim_lex)
 
-            if self.token_type == "C01":
-                if self.texto_fonte[self.tamanho_limite] != '"':
-                    self.texto_fonte[self.tamanho_limite] = '"'
+        if self.token_type == "C01":
+            if self.source_code[self.fim_lex] != '"':
+                self.source_code[self.fim_lex] = '"'
+                self.delimitar(self.inicio_lex, self.fim_lex)
 
-    def get_token_type(self, estado):
+    def get_token_type(self, estado, lexeme):
         if estado == "Q5":
             return "C03"
         if estado in ("Q7", "Q10"):
             return "C04"
         if estado == "Q11":
+            cod = get_codigo(lexeme)
+            if cod != None:
+                return cod
             return "C07"
         if estado == "Q12":
-            return "C00"
+            return "C07"
         if estado == "Q15":
             return "C02"
         if estado == "Q18":

@@ -39,8 +39,8 @@ def determinar_escopo(previous_token):
 
 
 def get_codigo(lexeme):
-    for padrao, codigo in PALAVRAS:
-        if re.fullmatch(padrao, lexeme):
+    for palavra, codigo in PALAVRAS:
+        if palavra == lexeme:
             return codigo
     return None
 
