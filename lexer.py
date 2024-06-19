@@ -25,9 +25,13 @@ class Lexer:
         automato.add_estados_base()
         self.filtro()
 
-        lexeme, token_type, self.inicio_lex, self.source_code, qtd_antes_truncar = automato.run(self.source_code, self.inicio_lex)
-        while lexeme == 'ERRO' and token_type == 'ERRO':
-            lexeme, token_type, self.inicio_lex, self.source_code, qtd_antes_truncar = automato.run(self.source_code, self.inicio_lex)
+        lexeme, token_type, self.inicio_lex, self.source_code, qtd_antes_truncar = (
+            automato.run(self.source_code, self.inicio_lex)
+        )
+        while lexeme == "ERRO" and token_type == "ERRO":
+            lexeme, token_type, self.inicio_lex, self.source_code, qtd_antes_truncar = (
+                automato.run(self.source_code, self.inicio_lex)
+            )
 
         return (lexeme, token_type, qtd_antes_truncar)
 
@@ -75,12 +79,7 @@ class Lexer:
         # adciona palavra reservada na lista de dados
         # index (-1) para sinalizar que é uma palavra reservada
         self.tokens_dados_p_relatorio.append(
-            (
-                lexeme,
-                token_type,
-                (-1),
-                self.current_line
-            )
+            (lexeme, token_type, (-1), self.current_line)
         )
 
     def tratamento_construcoes(

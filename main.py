@@ -26,7 +26,9 @@ def main():
     # 3º: loop analisador lexico
     while inicio_lex < len(source_code):
         escopo = determinar_escopo(previous_token)
-        previous_token, inicio_lex = lexer.formar_atomo(inicio_lex, escopo, symbol_table)
+        previous_token, inicio_lex = lexer.formar_atomo(
+            inicio_lex, escopo, symbol_table
+        )
 
     tokens_dados_p_relatorio = lexer.get_tokens_dados()
 

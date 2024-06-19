@@ -2,6 +2,7 @@
 
 from utils import get_codigo
 
+
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
@@ -11,28 +12,28 @@ class SymbolTable:
         if lexeme not in self.symbols:
 
             self.symbols[lexeme] = {
-                'Index': self.index,
-                'Codigo': token_type,
-                'Lexeme': lexeme,
-                'QtdAntesTruncar': qtd_antes_truncar,
-                'QtdCharDpsTruncar': len(lexeme),
-                'Qtd': 1,
-                'Tipo': get_codigo(lexeme),
-                'Linhas': [current_line],
+                "Index": self.index,
+                "Codigo": token_type,
+                "Lexeme": lexeme,
+                "QtdAntesTruncar": qtd_antes_truncar,
+                "QtdCharDpsTruncar": len(lexeme),
+                "Qtd": 1,
+                "Tipo": get_codigo(lexeme),
+                "Linhas": [current_line],
             }
             self.index += 1
         else:
             self.add_line(lexeme, current_line)
-            self.symbols[lexeme]['Qtd'] += 1
+            self.symbols[lexeme]["Qtd"] += 1
 
     def add_line(self, lexeme, current_line):
-        self.symbols[lexeme]['Linhas'].append(current_line)
+        self.symbols[lexeme]["Linhas"].append(current_line)
 
     def get_symbols(self):
         return self.symbols
-    
+
     def getIndex(self, lexeme, token_type):
-        if lexeme in self.symbols and self.symbols[lexeme]['Codigo'] == token_type:
-            return self.symbols[lexeme]['Index']
+        if lexeme in self.symbols and self.symbols[lexeme]["Codigo"] == token_type:
+            return self.symbols[lexeme]["Index"]
         else:
             return -1
