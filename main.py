@@ -10,8 +10,8 @@ from header import header
 def main():
     # 1º: abrir o arquivo e salvar o endereço
 
-    # file = input('Digite o nome do arquivo: ')
-    file = "meuTeste"
+    file = input('Digite o nome do arquivo: ')
+    # file = "meuTeste"
     source_code = read_file(file)
 
     # 2º: inicializar variaveis e objetos
@@ -42,8 +42,9 @@ def main():
     tokens_dados_p_relatorio = lexer.get_tokens_dados_p_relatorio()
 
     # 4º: gerar relatorios .LEX e .TAB
-    relatorio = Relatorio(tokens_dados_p_relatorio)
-    relatorio.gerar_lex(file)
+    relatorio = Relatorio(tokens_dados_p_relatorio, file)
+    relatorio.gerar_lex()
+    relatorio.gerar_tab()
 
 
 #     symbol_table = SymbolTable()

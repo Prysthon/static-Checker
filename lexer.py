@@ -1,11 +1,8 @@
-# lexer.py
-
 from palavras import PALAVRAS
 from alfabeto import ALFABETO
 from utils import uppercase_menos_sequencias
 from utils import remover_invalidos
 from automato import AutomatoLex
-
 
 class Lexer:
     def __init__(self, source_code):
@@ -15,6 +12,9 @@ class Lexer:
         self.inicio_lex = 0
         self.especial = 0
         self.automato = AutomatoLex(self.source_code)
+        self.lexeme_ids = {}  # Dicionário para armazenar IDs dos lexemes
+        self.next_id = 1      # Inicializa o próximo ID
+        
 
     def formacao_lexeme(self, inicio_lex, escopo):
         self.inicio_lex = inicio_lex
@@ -76,25 +76,32 @@ class Lexer:
         return False
 
     def tratamento_reservada(self, lexeme, token_type):
-        # adciona palavra reservada na lista de dados
-        # index (-1) para sinalizar que é uma palavra reservada
+        # Adiciona palavra reservada na lista de dados
+        # Index (-1) para sinalizar que é uma palavra reservada
+        lexeme_id = self.get_lexeme_id(lexeme)
         self.tokens_dados_p_relatorio.append(
-            (lexeme, token_type, (-1), self.current_line)
+            (lexeme, token_type, lexeme_id, self.current_line)
         )
+
+    def get_lexeme_id(self, lexeme):
+        if lexeme not in self.lexeme_ids:
+            self.lexeme_ids[lexeme] = self.next_id
+            self.next_id += 1
+        return self.lexeme_ids[lexeme]
 
     def tratamento_construcoes(
         self, lexeme, token_type, symbol_table, qtd_antes_truncar
     ):
-
-        # adciona átomo formado na tabela de símbolos
+        # Adiciona átomo formado na tabela de símbolos
         # symbol_table.add(lexeme, token_type, qtd_antes_truncar, self.current_line)
 
-        # adciona construção na lista de dados
+        # Adiciona construção na lista de dados
+        lexeme_id = self.get_lexeme_id(lexeme)
         self.tokens_dados_p_relatorio.append(
             (
                 lexeme,
                 token_type,
-                symbol_table.getIndex(lexeme, token_type),
+                lexeme_id,
                 self.current_line,
             )
         )
