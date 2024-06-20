@@ -1,4 +1,4 @@
-# main.p
+# main.py
 
 from lexer import Lexer
 from symbol_table import SymbolTable
@@ -35,7 +35,7 @@ def main():
             if escopo != "C07":
                 escopo_ja_usado = False
 
-        previous_token, inicio_lex = lexer.formar_atomo(
+        previous_token, inicio_lex, source_code = lexer.formar_atomo(
             inicio_lex, escopo, symbol_table
         )
 

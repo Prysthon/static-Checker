@@ -54,7 +54,7 @@ class AutomatoLex:
         self.prox_char = 0
         self.tamanho = 0
         self.posicao_limite = 0
-        self.is_aceitacao = 0
+        self.is_aceitacao = False
         # valores para serem retornardos
         self.lexeme = ""
         self.token_type = ""
@@ -69,7 +69,7 @@ class AutomatoLex:
         self.prox_char = inicio_lex
         self.tamanho = 0
         self.posicao_limite = 0
-        self.is_aceitacao = 0
+        self.is_aceitacao = False
         self.lexeme = ""
         self.token_type = ""
         self.qtd_antes_truncar = 0
@@ -91,6 +91,8 @@ class AutomatoLex:
         funcao = self.funcoes[self.estado_inicial]
 
         while True:
+            a = self.source_code[self.prox_char]
+            b = len(self.source_code)
             # velho_estado tem que ser salvo para caso de transição não prevista
             velho_estado = novo_estado
             # caracter da posição final atual do átomo é enviado como parâmetro para a função do estado atual
@@ -102,7 +104,7 @@ class AutomatoLex:
             self.tamanho += 1
 
             if self.tamanho == 30:
-                self.posicao_limite = self.prox_char - 1
+                self.posicao_limite = self.prox_char
 
             # primeiro caso de conclusão, transição não prevista
             if novo_estado == "erro":
@@ -111,16 +113,17 @@ class AutomatoLex:
                 self.tamanho -= 1
 
                 if velho_estado in self.estados_finais:
-                    self.is_aceitacao = 1
+                    self.is_aceitacao = True
                 else:
-                    self.is_aceitacao = 0
-
-                self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
+                    self.is_aceitacao = False
+                
+                if self.tamanho > 30:
+                    self.lexeme = self.delimitar(self.inicio_lex, self.posicao_limite - 1)
+                else:
+                    self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
                 self.token_type = self.get_token_type(velho_estado, self.lexeme, escopo)
 
-                self.qtd_antes_truncar = self.fim_lex - self.inicio_lex
-                if self.qtd_antes_truncar == 0:
-                    self.qtd_antes_truncar = 1
+                self.qtd_antes_truncar = self.fim_lex - self.inicio_lex + 1
 
                 if self.tamanho > 30:  # tamanho máximo permitido para átomos é 30
                     self.truncar()
@@ -148,17 +151,18 @@ class AutomatoLex:
                 if novo_estado not in self.funcoes:
 
                     if novo_estado in self.estados_finais:
-                        self.is_aceitacao = 1
+                        self.is_aceitacao = True
                     else:
-                        self.is_aceitacao = 0
+                        self.is_aceitacao = False
 
                     self.fim_lex = self.prox_char - 1
-                    self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
-                    self.token_type = self.get_token_type(novo_estado, self.lexeme, escopo)
 
-                    self.qtd_antes_truncar = self.fim_lex - self.inicio_lex
-                    if self.qtd_antes_truncar == 0:
-                        self.qtd_antes_truncar = 1
+                    if self.tamanho > 30:
+                        self.lexeme = self.delimitar(self.inicio_lex, self.posicao_limite - 1)
+                    else:
+                        self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
+
+                    self.qtd_antes_truncar = self.fim_lex - self.inicio_lex - 1
 
                     if self.tamanho > 30:  # tamanho máximo permitido para átomos é 30
                         self.truncar()
@@ -180,11 +184,10 @@ class AutomatoLex:
                         self.qtd_antes_truncar,
                     )
                     # retorna: o lexeme, o token_type, a proxima posicao, o source_code modificado, e a qtd_antes_truncar
-
             funcao = self.funcoes[novo_estado]
 
     def is_relevante(self):
-        if self.is_aceitacao == 0:
+        if self.is_aceitacao == False:
             remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
             self.fim_lex = self.inicio_lex
             self.prox_char = self.inicio_lex

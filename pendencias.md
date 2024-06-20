@@ -1,7 +1,7 @@
 1. Fazer a tabela de símbolos funcionar (isso vai deixar o relatório .LEX correto) e emitir o relatório .TAB
 2. Fazer a análise de escopo funcionar (corrigir o autômato) -> FEITO (funcionando com nomPrograma, não testei com nomFuncao)
-4. Fazer o guia de uso para o professor
-5. Fazer todos casos funcionarem:
+3. Fazer o guia de uso para o professor
+4. Fazer todos casos funcionarem:
   1- Filtragem correta de: -> FEITO
     1 -> Comentários de linha -> FEITO
     2 -> Comentários de bloco -> FEITO
@@ -9,7 +9,7 @@
   2- Átomo que termina com transição não prevista (não necessariamente sendo " ") -> FEITO
   3- Átomo que termina por atingir estado final sem mais transições -> FEITO
   4- Átomo maior que 30 caracteres:
-    1 -> Truncar corretamente, filtrando os caracteres depois do limite e antes do próximo delimitador
+    1 -> Truncar corretamente, filtrando os caracteres depois do limite e antes do próximo delimitador -> FEITO
     2 -> Casos especiais de truncagem:
       1: Float que termina com "." ou "E": reduzir em 1 o tamanho, filtrar esse "." ou "E", mudar o tipo do átomo para Inteiro
       2: Float que passou a não ter mais um ".": transformar em inteiro

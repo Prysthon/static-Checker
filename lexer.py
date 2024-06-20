@@ -65,6 +65,7 @@ class Lexer:
                 self.source_code = remover_invalidos(self.source_code, posicao, posicao)
                 posicao -= 1
             posicao += 1
+        self.source_code = self.source_code + "\n"
         return self.source_code
 
     def is_reservada(self, lexeme):
@@ -125,12 +126,12 @@ class Lexer:
 
         if self.is_reservada(lexeme):
             self.tratamento_reservada(lexeme, token_type)
-            return (token_type, self.inicio_lex)
+            return (token_type, self.inicio_lex, self.source_code)
         else:
             token_type = self.tratamento_construcoes(
                 lexeme, token_type, symbol_table, qtd_antes_truncar
             )
-            return (token_type, self.inicio_lex)
+            return (token_type, self.inicio_lex, self.source_code)
 
     def get_tokens_dados_p_relatorio(self):
         return self.tokens_dados_p_relatorio
