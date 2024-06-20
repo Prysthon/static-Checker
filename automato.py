@@ -93,7 +93,10 @@ class AutomatoLex:
             # velho_estado tem que ser salvo para caso de transição não prevista
             velho_estado = novo_estado
             # caracter da posição final atual do átomo é enviado como parâmetro para a função do estado atual
-            novo_estado = funcao(self.source_code[self.prox_char])
+            if velho_estado == 'Q0':
+                novo_estado = funcao(self.source_code[self.prox_char], escopo)
+            else:
+                novo_estado = funcao(self.source_code[self.prox_char])
             self.prox_char += 1
             self.tamanho += 1
 
@@ -112,7 +115,7 @@ class AutomatoLex:
                     self.is_aceitacao = 0
 
                 self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
-                self.token_type = self.get_token_type(velho_estado, self.lexeme)
+                self.token_type = self.get_token_type(velho_estado, self.lexeme, escopo)
 
                 self.qtd_antes_truncar = self.fim_lex - self.inicio_lex
                 if self.qtd_antes_truncar == 0:
@@ -219,7 +222,7 @@ class AutomatoLex:
                 self.source_code[self.fim_lex] = '"'
                 self.delimitar(self.inicio_lex, self.fim_lex)
 
-    def get_token_type(self, estado, lexeme):
+    def get_token_type(self, estado, lexeme, escopo):
         if estado == "Q5":
             return "C03"
         if estado in ("Q7", "Q10"):
@@ -228,8 +231,11 @@ class AutomatoLex:
             cod = get_codigo(lexeme)
             if cod != None:
                 return cod
-            return "C07"
+            return escopo
         if estado == "Q12":
+            cod = get_codigo(lexeme)
+            if cod != None:
+                return cod
             return "C07"
         if estado == "Q15":
             return "C02"
@@ -259,7 +265,7 @@ class AutomatoLex:
         self.add_estado("Q17", self.q17)
         self.add_estado("Q18", None, is_estado_final=1)
 
-    def q0(self, caracter):
+    def q0(self, caracter, escopo):
         if caracter in (
             "%",
             "(",
@@ -312,7 +318,10 @@ class AutomatoLex:
             "Y",
             "Z",
         ):
-            return "Q11"
+            if escopo in ("C05", "C06"):
+                return "Q11"
+            else:
+                return "Q12"
         if caracter == "_":
             return "Q12"
         if caracter == "'":
@@ -414,8 +423,6 @@ class AutomatoLex:
             "9",
         ):
             return "Q11"
-        if caracter in ("_"):
-            return "Q12"
         else:
             return "erro"
 

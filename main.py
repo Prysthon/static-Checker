@@ -1,4 +1,4 @@
-# main.py
+# main.p
 
 from lexer import Lexer
 from symbol_table import SymbolTable
@@ -20,12 +20,20 @@ def main():
 
     inicio_lex = 0
     tokens_dados_p_relatorio = []
-    escopo = ""
+    escopo = "C07"
     previous_token = ""
+    escopo_ja_usado = True
     
     # 3º: loop analisador lexico
     while inicio_lex < len(source_code) - 1:
-        escopo = determinar_escopo(previous_token)
+        if previous_token in ("C05", "C06"):
+            escopo_ja_usado = True
+
+        if escopo_ja_usado == True:
+            escopo = determinar_escopo(previous_token)
+            if escopo != "C07":
+                escopo_ja_usado = False
+
         previous_token, inicio_lex = lexer.formar_atomo(
             inicio_lex, escopo, symbol_table
         )
