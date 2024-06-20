@@ -38,7 +38,6 @@ class Lexer:
         fim = 0
 
         while posicao < len(self.source_code):
-            a = self.source_code[posicao]
             # remoção de comentários
             if self.source_code[posicao] == "/":
                 # comentários de linha
@@ -55,7 +54,6 @@ class Lexer:
                     inicio = posicao
                     fim = posicao
                     while fim < len(self.source_code) - 1:
-                        a = self.source_code[fim]
                         if self.source_code[fim] == "*" and self.source_code[fim + 1] == "/":
                             break
                         fim += 1

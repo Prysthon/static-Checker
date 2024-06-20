@@ -76,7 +76,8 @@ class AutomatoLex:
 
     def add_estado(self, nome, funcao, is_estado_final=0):
         nome = nome.upper()
-        self.funcoes[nome] = funcao
+        if funcao != None:
+            self.funcoes[nome] = funcao
         if is_estado_final:
             self.estados_finais.append(nome)
 
@@ -153,7 +154,7 @@ class AutomatoLex:
 
                     self.fim_lex = self.prox_char - 1
                     self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
-                    self.token_type = self.get_token_type(novo_estado)
+                    self.token_type = self.get_token_type(novo_estado, self.lexeme, escopo)
 
                     self.qtd_antes_truncar = self.fim_lex - self.inicio_lex
                     if self.qtd_antes_truncar == 0:
