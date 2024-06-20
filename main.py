@@ -41,8 +41,9 @@ def main():
     tokens_dados_p_relatorio = lexer.get_tokens_dados_p_relatorio()
 
     # 4º: gerar relatorios .LEX e .TAB
-    relatorio = Relatorio(tokens_dados_p_relatorio)
-    relatorio.gerar_lex(file)
+    relatorio = Relatorio(tokens_dados_p_relatorio, file)
+    relatorio.gerar_lex()
+    relatorio.gerar_tab()
 
 
 #     symbol_table = SymbolTable()
