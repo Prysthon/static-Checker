@@ -17,6 +17,7 @@ def main():
     # 2º: inicializar variaveis e objetos
     symbol_table = SymbolTable()
     lexer = Lexer(source_code)
+    source_code = lexer.filtro()
 
     inicio_lex = 0
     tokens_dados_p_relatorio = []

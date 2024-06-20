@@ -3,10 +3,10 @@
 3. Fazer com que o programa puxe da linha de comando o nome ou path do arquivo que será análisado (invés de somente "meuTeste.241")
 4. Fazer o guia de uso para o professor
 5. Fazer todos casos funcionarem:
-  1- Filtragem correta de:
-    1 -> Comentários de linha
-    2 -> Comentários de bloco
-    3 -> Caracteres fora do alfabeto da linguagem
+  1- Filtragem correta de: -> FEITO
+    1 -> Comentários de linha -> FEITO
+    2 -> Comentários de bloco -> FEITO
+    3 -> Caracteres fora do alfabeto da linguagem -> FEITO
   2- Átomo que termina com transição não prevista (não necessariamente sendo " ")
   3- Átomo que termina por atingir estado final sem mais transições
   4- Átomo maior que 30 caracteres:
