@@ -10,8 +10,8 @@ from header import header
 def main():
     # 1º: abrir o arquivo e salvar o endereço
 
-    # file = input('Digite o nome do arquivo: ')
-    file = "meuTeste"
+    file = input('Digite o nome do arquivo: ')
+    # file = "meuTeste"
     source_code = read_file(file)
 
     # 2º: inicializar variaveis e objetos

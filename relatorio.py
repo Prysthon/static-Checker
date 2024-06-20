@@ -1,6 +1,6 @@
 from header import header
 from tabulate import tabulate
-
+import os
 
 class Relatorio:
     def __init__(self, tokens):
@@ -12,7 +12,17 @@ class Relatorio:
             headers=["Lexeme", "Código", "índiceTabSimb", "Linha"],
             tablefmt="grid",
         )
-        with open(f"{nome_arquivo}.LEX", "w") as file:
+
+        # Diretório da main.py
+        diretorio_main = os.path.dirname(os.path.abspath(__file__))
+
+        # Extrai o nome do arquivo sem o diretório e extensão
+        nome_arquivo = os.path.splitext(os.path.basename(nome_arquivo))[0]
+        
+        # Caminho completo do arquivo .LEX (junto da main.py)
+        caminho_arquivo = os.path.join(diretorio_main, f"{nome_arquivo}.LEX")
+
+        with open(caminho_arquivo, "w") as file:
             file.write(header)
             file.write(
                 f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: {nome_arquivo}.241\n"
