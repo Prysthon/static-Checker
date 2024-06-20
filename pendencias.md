@@ -1,4 +1,4 @@
-1. Fazer a tabela de símbolos funcionar (isso vai deixar o relatório .LEX correto) e emitir o relatório .TAB
+1. emitir o relatório .TAB
 2. Fazer a análise de escopo funcionar (corrigir o autômato) -> FEITO (funcionando com nomPrograma, não testei com nomFuncao)
 4. Fazer o guia de uso para o professor
 5. Fazer todos casos funcionarem:
