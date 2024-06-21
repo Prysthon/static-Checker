@@ -52,11 +52,11 @@ class Relatorio:
             "VOID": "VOI",
         }
 
-        for lexeme, codigo, indice, linha in self.tokens:
+        for lexeme, codigo, qtd_antes_truncar, indice, linha in self.tokens:
             if codigo.startswith('C'):
                 tabela_simbolos[indice]['Lexeme'] = lexeme
                 tabela_simbolos[indice]['Codigo'] = codigo
-                tabela_simbolos[indice]['QtdCharAntesTrunc'] = len(lexeme)
+                tabela_simbolos[indice]['QtdCharAntesTrunc'] = qtd_antes_truncar
                 tabela_simbolos[indice]['QtdCharDepoisTrunc'] = len(lexeme)
                 tabela_simbolos[indice]['TipoSimb'] = TipoSimb.get(codigo, '-')
                 if (TipoSimb.get(codigo, '-') == 'STR') and (len(lexeme) == 1):

@@ -1,5 +1,4 @@
 # lexer.py
-from palavras import PALAVRAS
 from alfabeto import ALFABETO
 from utils import uppercase_menos_sequencias
 from utils import remover_invalidos
@@ -57,39 +56,23 @@ class Lexer:
         self.source_code = self.source_code + "\n"
         return self.source_code
 
-    def is_reservada(self, lexeme):
-        for palavra, _ in PALAVRAS:
-            if lexeme == palavra:
-                return True
-        return False
-
-    def tratamento_reservada(self, lexeme, token_type):
-        lexeme_id = self.get_lexeme_id(lexeme, token_type)
-        self.tokens_dados_p_relatorio.append(
-            (lexeme, token_type, lexeme_id, self.current_line)
-        )
-
     def get_lexeme_id(self, lexeme, token_type):
-        if not token_type.startswith('C'):
-            self.lexeme_ids[lexeme] = '-'
+        if not token_type.startswith("C"):
+            self.lexeme_ids[lexeme] = "-"
             return self.lexeme_ids[lexeme]
         if lexeme not in self.lexeme_ids:
             self.lexeme_ids[lexeme] = self.next_id
             self.next_id += 1
         return self.lexeme_ids[lexeme]
 
-    def tratamento_construcoes(
-        self, lexeme, token_type, symbol_table, qtd_antes_truncar
-    ):
-        # Adiciona átomo formado na tabela de símbolos
-        # symbol_table.add(lexeme, token_type, qtd_antes_truncar, self.current_line)
-
+    def tratamento_construcoes(self, lexeme, token_type, qtd_antes_truncar):
         # Adiciona construção na lista de dados
         lexeme_id = self.get_lexeme_id(lexeme, token_type)
         self.tokens_dados_p_relatorio.append(
             (
                 lexeme,
                 token_type,
+                qtd_antes_truncar,
                 lexeme_id,
                 self.current_line,
             )
@@ -97,7 +80,7 @@ class Lexer:
 
         return token_type
 
-    def formar_atomo(self, inicio_lex, escopo, symbol_table):
+    def formar_atomo(self, inicio_lex, escopo):
         self.inicio_lex = inicio_lex
         lexeme = ""
         token_type = ""
@@ -113,14 +96,8 @@ class Lexer:
                 self.automato.run(self.source_code, self.inicio_lex, escopo)
             )
 
-        if self.is_reservada(lexeme):
-            self.tratamento_reservada(lexeme, token_type)
-            return (token_type, self.inicio_lex, self.source_code)
-        else:
-            token_type = self.tratamento_construcoes(
-                lexeme, token_type, symbol_table, qtd_antes_truncar
-            )
-            return (token_type, self.inicio_lex, self.source_code)
+        token_type = self.tratamento_construcoes(lexeme, token_type, qtd_antes_truncar)
+        return (token_type, self.inicio_lex, self.source_code)
 
     def verificar_caracter_valido(self):
         eof = False
