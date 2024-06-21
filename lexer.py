@@ -115,7 +115,7 @@ class Lexer:
 
         while self.source_code[self.inicio_lex] in (" ", "\n", "\t", "\r"):
             if self.inicio_lex >= len(self.source_code) - 1:
-                return (token_type, self.inicio_lex)
+                return (token_type, self.inicio_lex, self.source_code)
             if self.source_code[self.inicio_lex] in ("\n", "\r"):
                 self.current_line += 1
             self.inicio_lex += 1
