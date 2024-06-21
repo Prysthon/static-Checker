@@ -41,17 +41,37 @@ class Relatorio:
             'Linhas': set()
         })
 
+        TipoSimb = {
+            "PONTO FLUTUANTE": "PFO",
+            "INTEIRO": "INT",
+            "REAL": "INT",
+            "PROGRAMA": "STR",
+            "STRING": "STR",
+            "CHARACTER": "CHC",
+            "BOOLEANO": "BOO",
+            "VOID": "VOI",
+            "ARRAY DE PONTO FLUTUANTE": "APF",
+            "ARRAY DE INTEIRO": "AIN",
+            "ARRAY DE STRING": "AST",
+            "ARRAY DE CHARACTER": "ACH",
+            "ARRAY DE BOOLEANO": "ABO"
+        }
+
         for lexeme, codigo, indice, linha in self.tokens:
-            tabela_simbolos[indice]['Lexeme'] = lexeme
-            tabela_simbolos[indice]['Codigo'] = codigo
-            tabela_simbolos[indice]['QtdCharDepoisTrunc'] = len(lexeme)
-            tabela_simbolos[indice]['Linhas'].add(linha)
+            if codigo.startswith('C'):
+                tabela_simbolos[indice]['Lexeme'] = lexeme
+                tabela_simbolos[indice]['Codigo'] = codigo
+                tabela_simbolos[indice]['QtdCharAntesTrunc'] = len(lexeme)
+                tabela_simbolos[indice]['QtdCharDepoisTrunc'] = len(lexeme)
+                tabela_simbolos[indice]['TipoSimb'] = TipoSimb.get(previous_token, '-')
+                tabela_simbolos[indice]['Linhas'].add(linha)
+            else:
+                previous_token = lexeme
 
         linhas_relatorio = []
         for indice, dados in tabela_simbolos.items():
             linhas_relatorio.append(f"Entrada: {indice}, Codigo: {dados['Codigo']}, Lexeme: {dados['Lexeme']},\nQtdCharAntesTrunc: {dados['QtdCharAntesTrunc']}, QtdCharDepoisTrunc: {dados['QtdCharDepoisTrunc']},\nTipoSimb: {dados['TipoSimb']}, Linhas: {sorted(dados['Linhas'])}.")
             linhas_relatorio.append("-" * 80)
-
         caminho_arquivo = self.path(self.nome_arquivo, "TAB")
         with open(caminho_arquivo, "w") as file:
             file.write(header)
