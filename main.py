@@ -1,13 +1,14 @@
 # main.py
+import sys
 from lexer import Lexer
 from relatorio import Relatorio
 from utils import read_file, analise_escopo
 
 
-def main():
+def main(arq):
     # 1º: abrir o arquivo e salvar o endereço
-    file = input("Digite o nome do arquivo: ")
-    source_code = read_file(file)
+    #file = input("Digite o nome do arquivo: ")
+    source_code = read_file(arq)
 
     # 2º: inicializar objetos e variaveis
     lexer = Lexer(source_code)
@@ -26,10 +27,10 @@ def main():
 
     # 4º: gerar relatorios .LEX e .TAB
     tokens_dados_p_relatorio = lexer.get_tokens_dados_p_relatorio()
-    relatorio = Relatorio(tokens_dados_p_relatorio, file)
+    relatorio = Relatorio(tokens_dados_p_relatorio, arq)
     relatorio.gerar_lex()
     relatorio.gerar_tab()
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1])
