@@ -64,12 +64,15 @@ class Lexer:
         return False
 
     def tratamento_reservada(self, lexeme, token_type):
-        lexeme_id = self.get_lexeme_id(lexeme)
+        lexeme_id = self.get_lexeme_id(lexeme, token_type)
         self.tokens_dados_p_relatorio.append(
             (lexeme, token_type, lexeme_id, self.current_line)
         )
 
-    def get_lexeme_id(self, lexeme):
+    def get_lexeme_id(self, lexeme, token_type):
+        if not token_type.startswith('C'):
+            self.lexeme_ids[lexeme] = '-'
+            return self.lexeme_ids[lexeme]
         if lexeme not in self.lexeme_ids:
             self.lexeme_ids[lexeme] = self.next_id
             self.next_id += 1
@@ -82,7 +85,7 @@ class Lexer:
         # symbol_table.add(lexeme, token_type, qtd_antes_truncar, self.current_line)
 
         # Adiciona construção na lista de dados
-        lexeme_id = self.get_lexeme_id(lexeme)
+        lexeme_id = self.get_lexeme_id(lexeme, token_type)
         self.tokens_dados_p_relatorio.append(
             (
                 lexeme,

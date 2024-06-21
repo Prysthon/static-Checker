@@ -42,19 +42,14 @@ class Relatorio:
         })
 
         TipoSimb = {
-            "PONTO FLUTUANTE": "PFO",
             "INTEIRO": "INT",
             "REAL": "INT",
             "PROGRAMA": "STR",
             "STRING": "STR",
             "CHARACTER": "CHC",
-            "BOOLEANO": "BOO",
+            "FALSE": "BOO",
+            "TRUE": "BOO",
             "VOID": "VOI",
-            "ARRAY DE PONTO FLUTUANTE": "APF",
-            "ARRAY DE INTEIRO": "AIN",
-            "ARRAY DE STRING": "AST",
-            "ARRAY DE CHARACTER": "ACH",
-            "ARRAY DE BOOLEANO": "ABO"
         }
 
         for lexeme, codigo, indice, linha in self.tokens:
