@@ -42,13 +42,13 @@ class Relatorio:
         })
 
         TipoSimb = {
-            "INTEIRO": "INT",
-            "REAL": "INT",
-            "PROGRAMA": "STR",
-            "STRING": "STR",
-            "CHARACTER": "CHC",
-            "FALSE": "BOO",
-            "TRUE": "BOO",
+            "C01": "STR",
+            "C02": "CHC",
+            "C03": "INT",
+            "C04": "PFO",
+            "C05": "STR",
+            "C06": "STR",
+            "C07": "STR",
             "VOID": "VOI",
         }
 
@@ -58,10 +58,10 @@ class Relatorio:
                 tabela_simbolos[indice]['Codigo'] = codigo
                 tabela_simbolos[indice]['QtdCharAntesTrunc'] = len(lexeme)
                 tabela_simbolos[indice]['QtdCharDepoisTrunc'] = len(lexeme)
-                tabela_simbolos[indice]['TipoSimb'] = TipoSimb.get(previous_token, '-')
+                tabela_simbolos[indice]['TipoSimb'] = TipoSimb.get(codigo, '-')
+                if (TipoSimb.get(codigo, '-') == 'STR') and (len(lexeme) == 1):
+                    tabela_simbolos[indice]['TipoSimb'] = "CHC"
                 tabela_simbolos[indice]['Linhas'].add(linha)
-            else:
-                previous_token = lexeme
 
         linhas_relatorio = []
         for indice, dados in tabela_simbolos.items():
