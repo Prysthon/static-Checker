@@ -11,9 +11,9 @@
   4- Átomo maior que 30 caracteres:
     1 -> Truncar corretamente, filtrando os caracteres depois do limite e antes do próximo delimitador -> FEITO
     2 -> Casos especiais de truncagem:
-      1: Float que termina com "." ou "E": reduzir em 1 o tamanho, filtrar esse "." ou "E", mudar o tipo do átomo para Inteiro
-      2: Float que passou a não ter mais um ".": transformar em inteiro
-      3: String que não termina com '"': transformar o último caracter em uma '"'
+      1: Float que termina com "." ou "E": reduzir em 1 o tamanho, filtrar esse "." ou "E", mudar o tipo do átomo para Inteiro -> FEITO
+      2: Float que passou a não ter mais um ".": transformar em inteiro -> FEITO
+      3: String que não termina com '"': transformar o último caracter em uma '"' -> FEITO
   5- Verificar construções não relevantes:
     1 -> String com caracteres inválidos no meio
     2 -> Átomo que foi delimitado num estado não final

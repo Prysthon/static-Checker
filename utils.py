@@ -46,5 +46,7 @@ def get_codigo(lexeme):
 
 
 def remover_invalidos(source_code, inicio, fim):
+    # [:inicio] indica todos caracteres do começo da string até, mas não incluindo, o caracter na posição inicio
+    # [(fim + 1) :] indica todos caracteres a partir da posição fim + 1 (incluindo o próprio fim + 1) até o final da string
     str = source_code[:inicio] + source_code[(fim + 1) :]
     return str

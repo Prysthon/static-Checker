@@ -104,7 +104,7 @@ class AutomatoLex:
             self.tamanho += 1
 
             if self.tamanho == 30:
-                self.posicao_limite = self.prox_char
+                self.posicao_limite = self.prox_char - 1
 
             # primeiro caso de conclusão, transição não prevista
             if novo_estado == "erro":
@@ -118,7 +118,7 @@ class AutomatoLex:
                     self.is_aceitacao = False
                 
                 if self.tamanho > 30:
-                    self.lexeme = self.delimitar(self.inicio_lex, self.posicao_limite - 1)
+                    self.lexeme = self.delimitar(self.inicio_lex, self.posicao_limite)
                 else:
                     self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
                 self.token_type = self.get_token_type(velho_estado, self.lexeme, escopo)
@@ -161,6 +161,7 @@ class AutomatoLex:
                         self.lexeme = self.delimitar(self.inicio_lex, self.posicao_limite - 1)
                     else:
                         self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
+                    self.token_type = self.get_token_type(novo_estado, self.lexeme, escopo)
 
                     self.qtd_antes_truncar = self.fim_lex - self.inicio_lex - 1
 
@@ -210,21 +211,21 @@ class AutomatoLex:
         # verificação de casos especiais:
         if self.token_type == "C04":
             if self.source_code[self.fim_lex] in (".", "E"):
-                self.self.fim_lex -= 1
-                remover_invalidos(self.source_code, self.fim_lex + 1, self.fim_lex + 1)
+                self.fim_lex -= 1
+                self.source_code = remover_invalidos(self.source_code, self.fim_lex + 1, self.fim_lex + 1)
                 self.token_type = "C03"
-                self.delimitar(self.inicio_lex, self.fim_lex)
+                self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
 
-        if self.token_type == "C04":
-            str = self.source_code[self.inicio_lex : self.fim_lex + 1]
-            if "." not in str:
-                self.token_type = "C03"
-                self.delimitar(self.inicio_lex, self.fim_lex)
+            else:
+                str = self.source_code[self.inicio_lex : self.fim_lex + 1]
+                if "." not in str:
+                    self.token_type = "C03"
+                    self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
 
         if self.token_type == "C01":
             if self.source_code[self.fim_lex] != '"':
-                self.source_code[self.fim_lex] = '"'
-                self.delimitar(self.inicio_lex, self.fim_lex)
+                self.source_code = self.source_code[:self.fim_lex] + '"' + self.source_code[(self.fim_lex + 1) :]
+                self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
 
     def get_token_type(self, estado, lexeme, escopo):
         if estado == "Q5":
@@ -362,6 +363,8 @@ class AutomatoLex:
             return "erro"
 
     def q7(self, caracter):
+        if caracter in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
+            return "Q7"
         if caracter == "E":
             return "Q8"
         else:
@@ -508,6 +511,35 @@ class AutomatoLex:
             return "erro"
 
     def q14(self, caracter):
+        if caracter in (
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+        ):
+            return "Q14"
         if caracter == "'":
             return "Q15"
         else:
@@ -522,5 +554,7 @@ class AutomatoLex:
     def q17(self, caracter):
         if caracter == '"':
             return "Q18"
+        if caracter in ALFABETO:
+            return "Q17"
         else:
             return "erro"
