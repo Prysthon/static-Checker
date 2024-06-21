@@ -26,6 +26,13 @@ class Lexer:
             self.automato.run(self.source_code, self.inicio_lex, escopo)
         )
         while lexeme == "erro" and token_type == "erro":
+            while self.source_code[self.inicio_lex] in (" ", "\n", "\t", "\r"):
+                if self.inicio_lex >= len(self.source_code) - 1:
+                    return (token_type, self.inicio_lex, self.source_code)
+                if self.source_code[self.inicio_lex] in ("\n", "\r"):
+                    self.current_line += 1
+                self.inicio_lex += 1
+
             lexeme, token_type, self.inicio_lex, self.source_code, qtd_antes_truncar = (
                 self.automato.run(self.source_code, self.inicio_lex, escopo)
             )

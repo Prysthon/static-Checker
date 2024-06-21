@@ -15,5 +15,5 @@
       2: Float que passou a não ter mais um ".": transformar em inteiro -> FEITO
       3: String que não termina com '"': transformar o último caracter em uma '"' -> FEITO
   5- Verificar construções não relevantes:
-    1 -> String com caracteres inválidos no meio
+    1 -> String com caracteres inválidos no meio -> FEITO
     2 -> Átomo que foi delimitado num estado não final

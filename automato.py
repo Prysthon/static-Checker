@@ -1,6 +1,7 @@
 # automato.py
 
 from alfabeto import ALFABETO
+from alfabeto import ALFABETO_STRING
 from utils import remover_invalidos
 from utils import get_codigo
 
@@ -189,18 +190,18 @@ class AutomatoLex:
 
     def is_relevante(self):
         if self.is_aceitacao == False:
-            remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
+            self.source_code = remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
             self.fim_lex = self.inicio_lex
             self.prox_char = self.inicio_lex
             return False
 
         if self.token_type == "C01":
-            allowed_chars = set(c for c, *_ in ALFABETO)
-            if any(char not in allowed_chars for char in self.lexeme):
-                remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
-                self.fim_lex = self.inicio_lex
-                self.prox_char = self.inicio_lex
-                return False
+            for caracter in self.lexeme:
+                if caracter not in ALFABETO_STRING:
+                    self.source_code = remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
+                    self.fim_lex = self.inicio_lex
+                    self.prox_char = self.inicio_lex
+                    return False
         return True
 
     def truncar(self):
