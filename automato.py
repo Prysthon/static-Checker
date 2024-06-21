@@ -1,44 +1,8 @@
 # automato.py
-
 from alfabeto import ALFABETO
 from alfabeto import ALFABETO_STRING
 from utils import remover_invalidos
 from utils import get_codigo
-
-"""
-Implementar o autômato:
-    # FEITO # - O autômato deve receber a posição atual no texto-fonte, processar o caracter nessa posição e avançar seu estado, avançando também uma posição no texto-fonte;
-
-    # FEITO # - O token_type é definido por qual foi o estado de aceitação em que o átomo foi delimitado;
-
-    # FEITO # - Ao chegar em um estado de aceitação que não possua transições, o átomo é delimitado naquele ponto e o autômato se encerra;
-
-    # FEITO # - Se ocorrer uma transição não prevista, o átomo é delimitado na posição anterior do texto fonte e o autômato se encerra;
-
-    # FEITO # - Se o tamanho do átomo se tornar maior que 30, ele salva a posição do caracter número 30 e continua lendo os caracteres seguintes até encontrar um caracter delimitador.
-    
-    # FEITO # - Ao encontrar, ele salva numa variável o tamanho do átomo antes de truncar e a posição do caracter delimitador. Depois, ele trunca o átomo;
-    
-    # FEITO # Ao truncar o átomo, todos caracteres que estiverem entre a posição 30 deste átomo e o próximo delimitador são filtrados, como se fossem
-        caracteres inválidos, com a função remover_invalidos(posicao_do_fim_do_atomo + 1, posicao_do_delimitador - 1);
-    
-    # FEITO # - Após truncar, ele verifica se precisa modificar de alguma maneira o átomo resultante. Casos:
-        1. Ao truncar um átomo consReal, caso o átomo que resulte possua um "." no final ou um "E" no final, deve-se encurtar ainda mais o átomo para impedir isso,
-            e definir o token_type como consInteiro
-        2. Ao truncar um átomo consReal, caso o átomo que resulte não possua mais um ".", deve-se definir o token_type como consInteiro.
-        3. Ao truncar um átomo consCadeia, caso ele não termine com um ' " ', deve-se substituir o último caracter por um ' " '.
-
-    # FEITO # - Após truncar (se tiver sido necessário), verificar se a construção é relevante, ou seja, verificar um dos seguintes casos:
-        1. String com caracteres internos não permitidos: consCadeia pode possuir apenas os caracteres [A - Z] | [0 - 9] | "$" | "_" | ".";
-        2. Caso o autômato termine num estado de não aceitação
-    
-    # FEITO # - Caso a construção seja não relevante, o átomo inteiro deve ser filtrado e removido com remover_invalidos(posicao_do_inicio_do_atomo, posicao_do_fim_do_atomo)
-    # FEITO # - Caso a construção seja não relevante, tentar novamente formar outro átomo (até conseguir formar um átomo e o retornar, ou até EOF)
-
-    # FEITO # - Após tudo isso, modificar self.inicio_lex para ser igual a self.fim_lex + 1 (para que se continue o processo)
-
-    # FEITO # - Após tudo isso, retorna (lexeme, token_type, fim_lex + 1, source_code, qtd_antes_truncar)
-    """
 
 
 class AutomatoLex:
@@ -86,18 +50,14 @@ class AutomatoLex:
         return self.source_code[inicio_lex : fim_lex + 1]
 
     def run(self, source_code, inicio_lex, escopo):
-        self.reset_automato(source_code, inicio_lex,)
+        self.reset_automato(source_code, inicio_lex)
 
         novo_estado = self.estado_inicial
         funcao = self.funcoes[self.estado_inicial]
 
         while True:
-            a = self.source_code[self.prox_char]
-            b = len(self.source_code)
-            # velho_estado tem que ser salvo para caso de transição não prevista
-            velho_estado = novo_estado
-            # caracter da posição final atual do átomo é enviado como parâmetro para a função do estado atual
-            if velho_estado == 'Q0':
+            velho_estado = novo_estado  # velho_estado tem que ser salvo para caso de transição não prevista
+            if velho_estado == "Q0":
                 novo_estado = funcao(self.source_code[self.prox_char], escopo)
             else:
                 novo_estado = funcao(self.source_code[self.prox_char])
@@ -117,19 +77,22 @@ class AutomatoLex:
                     self.is_aceitacao = True
                 else:
                     self.is_aceitacao = False
-                
+
                 if self.tamanho > 30:
                     self.lexeme = self.delimitar(self.inicio_lex, self.posicao_limite)
                 else:
                     self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
+
                 self.token_type = self.get_token_type(velho_estado, self.lexeme, escopo)
 
                 self.qtd_antes_truncar = self.fim_lex - self.inicio_lex + 1
 
-                if self.tamanho > 30:  # tamanho máximo permitido para átomos é 30
+                # tamanho máximo permitido para átomos é 30
+                if self.tamanho > 30:
                     self.truncar()
 
-                if self.is_relevante() == False:  # testar para construção não relevante
+                # testar para construção não relevante
+                if self.is_relevante() == False:
                     return (
                         "erro",
                         "erro",
@@ -145,7 +108,6 @@ class AutomatoLex:
                     self.source_code,
                     self.qtd_antes_truncar,
                 )
-                # retorna: o lexeme, o token_type, a proxima posicao para se iniciar, o source_code modificado, e a qtd_antes_truncar
 
             # segundo caso de conclusão, estado final sem mais transições, delimitação ocorre na posição atual
             if novo_estado in self.estados_finais:
@@ -159,17 +121,22 @@ class AutomatoLex:
                     self.fim_lex = self.prox_char - 1
 
                     if self.tamanho > 30:
-                        self.lexeme = self.delimitar(self.inicio_lex, self.posicao_limite - 1)
+                        self.lexeme = self.delimitar(
+                            self.inicio_lex, self.posicao_limite - 1
+                        )
                     else:
                         self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
+
                     self.token_type = self.get_token_type(novo_estado, self.lexeme, escopo)
 
                     self.qtd_antes_truncar = self.fim_lex - self.inicio_lex - 1
 
-                    if self.tamanho > 30:  # tamanho máximo permitido para átomos é 30
+                    # tamanho máximo permitido para átomos é 30
+                    if self.tamanho > 30:
                         self.truncar()
 
-                    if self.is_relevante() == False:  # testar para construção não relevante
+                    # testar para construção não relevante
+                    if self.is_relevante() == False:
                         return (
                             "erro",
                             "erro",
@@ -185,12 +152,13 @@ class AutomatoLex:
                         self.source_code,
                         self.qtd_antes_truncar,
                     )
-                    # retorna: o lexeme, o token_type, a proxima posicao, o source_code modificado, e a qtd_antes_truncar
             funcao = self.funcoes[novo_estado]
 
     def is_relevante(self):
         if self.is_aceitacao == False:
-            self.source_code = remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
+            self.source_code = remover_invalidos(
+                self.source_code, self.inicio_lex, self.fim_lex
+            )
             self.fim_lex = self.inicio_lex
             self.prox_char = self.inicio_lex
             return False
@@ -198,7 +166,9 @@ class AutomatoLex:
         if self.token_type == "C01":
             for caracter in self.lexeme:
                 if caracter not in ALFABETO_STRING:
-                    self.source_code = remover_invalidos(self.source_code, self.inicio_lex, self.fim_lex)
+                    self.source_code = remover_invalidos(
+                        self.source_code, self.inicio_lex, self.fim_lex
+                    )
                     self.fim_lex = self.inicio_lex
                     self.prox_char = self.inicio_lex
                     return False
@@ -213,7 +183,9 @@ class AutomatoLex:
         if self.token_type == "C04":
             if self.source_code[self.fim_lex] in (".", "E"):
                 self.fim_lex -= 1
-                self.source_code = remover_invalidos(self.source_code, self.fim_lex + 1, self.fim_lex + 1)
+                self.source_code = remover_invalidos(
+                    self.source_code, self.fim_lex + 1, self.fim_lex + 1
+                )
                 self.token_type = "C03"
                 self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
 
@@ -225,7 +197,11 @@ class AutomatoLex:
 
         if self.token_type == "C01":
             if self.source_code[self.fim_lex] != '"':
-                self.source_code = self.source_code[:self.fim_lex] + '"' + self.source_code[(self.fim_lex + 1) :]
+                self.source_code = (
+                    self.source_code[: self.fim_lex]
+                    + '"'
+                    + self.source_code[(self.fim_lex + 1) :]
+                )
                 self.lexeme = self.delimitar(self.inicio_lex, self.fim_lex)
 
     def get_token_type(self, estado, lexeme, escopo):

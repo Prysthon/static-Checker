@@ -1,5 +1,5 @@
 1. Fazer a tabela de símbolos funcionar (isso vai deixar o relatório .LEX correto) e emitir o relatório .TAB
-2. Fazer a análise de escopo funcionar (corrigir o autômato) -> FEITO (funcionando com nomPrograma, não testei com nomFuncao)
+2. Fazer a análise de escopo funcionar (corrigir o autômato) -> FEITO
 3. Fazer o guia de uso para o professor
 4. Fazer todos casos funcionarem:
   1- Filtragem correta de: -> FEITO
@@ -16,4 +16,4 @@
       3: String que não termina com '"': transformar o último caracter em uma '"' -> FEITO
   5- Verificar construções não relevantes:
     1 -> String com caracteres inválidos no meio -> FEITO
-    2 -> Átomo que foi delimitado num estado não final
+    2 -> Átomo que foi delimitado num estado não final -> FEITO

@@ -1,5 +1,4 @@
 # utils.py
-
 import re
 from palavras import PALAVRAS
 
@@ -14,14 +13,24 @@ def write_file(file_path, content):
         file.write(content)
 
 
+# funcao para transformar tudo em maiusculo exceto sequencias de escape (\n, \r, \t)
 def uppercase_menos_sequencias(string):
-    # funcao para transformar tudo em maiusculo exceto sequencias de escape
     def maiusculo_menos_sequencias(match):
         if match.group() in ["\\n", "\\t", "\\r"]:
             return match.group()
         return match.group().upper()
 
     return re.sub(r"\\[ntr]|.", maiusculo_menos_sequencias, string)
+
+
+def analise_escopo(previous_token, escopo_ja_usado):
+    if previous_token in ("C05", "C06"):
+        escopo_ja_usado = True
+    if escopo_ja_usado == True:
+        escopo = determinar_escopo(previous_token)
+        if escopo != "C07":
+            escopo_ja_usado = False
+    return (escopo, escopo_ja_usado)
 
 
 def determinar_escopo(previous_token):
