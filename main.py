@@ -7,7 +7,6 @@ from utils import read_file, analise_escopo
 
 def main(arq):
     # 1º: abrir o arquivo e salvar o endereço
-    #file = input("Digite o nome do arquivo: ")
     source_code = read_file(arq)
 
     # 2º: inicializar objetos e variaveis

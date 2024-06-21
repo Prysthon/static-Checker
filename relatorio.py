@@ -9,12 +9,16 @@ class Relatorio:
         self.nome_arquivo = nome_arquivo
 
     def path(self, nome_arquivo, extensao):
-        # Diretório da main.py
-        diretorio_main = os.path.dirname(os.path.abspath(__file__))
-        # Extrai o nome do arquivo sem o diretório e extensão
-        nome_arquivo = os.path.splitext(os.path.basename(nome_arquivo))[0]
-        # Caminho completo do arquivo com a extensão especificada (junto da main.py)
-        return os.path.join(diretorio_main, f"{nome_arquivo}.{extensao}")
+         # Extrai o nome do arquivo e o diretório (se fornecido)
+        diretorio_arquivo = os.path.dirname(nome_arquivo)
+        nome_arquivo_sem_extensao = os.path.splitext(os.path.basename(nome_arquivo))[0]
+
+        # Se não houver diretório, usa o diretório da main.py
+        if not diretorio_arquivo:
+            diretorio_arquivo = os.path.dirname(os.path.abspath(__file__))
+
+        # Caminho completo do arquivo com a extensão especificada
+        return os.path.join(diretorio_arquivo, f"{nome_arquivo_sem_extensao}.{extensao}")
 
     def gerar_lex(self):
         tabela = tabulate(
